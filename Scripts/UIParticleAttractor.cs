@@ -45,7 +45,11 @@ namespace Coffee.UIExtensions
         [SerializeField]
         private UnityEvent m_OnAttracted;
 
+        [SerializeField]
+        private UnityEvent m_OnFirstParticleAttracted;
+
         private UIParticle _uiParticle;
+        private bool _firstParticleAttracted;
 
         public float destinationRadius
         {
@@ -81,6 +85,12 @@ namespace Coffee.UIExtensions
         {
             get { return m_OnAttracted; }
             set { m_OnAttracted = value; }
+        }
+
+        public UnityEvent onFirstParticleAttracted
+        {
+            get { return m_OnFirstParticleAttracted; }
+            set { m_OnFirstParticleAttracted = value; }
         }
 
 #if UNITY_EDITOR
@@ -133,6 +143,19 @@ namespace Coffee.UIExtensions
                 {
                     p.remainingLifetime = 0f;
                     particles[i] = p;
+
+                    if (m_OnFirstParticleAttracted != null && !_firstParticleAttracted)
+                    {
+                        try
+                        {
+                            m_OnFirstParticleAttracted.Invoke();
+                            _firstParticleAttracted = true;
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.LogException(e);
+                        }
+                    }
 
                     if (m_OnAttracted != null)
                     {
